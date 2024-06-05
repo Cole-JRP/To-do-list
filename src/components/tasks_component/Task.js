@@ -1,23 +1,45 @@
-import {FaTimes} from 'react-icons/fa'
+import { FaTimes, FaEdit } from 'react-icons/fa'
+import EditTask from './EditTask'
+import React, { useState } from 'react'
 
-const Task = ({ task, sectionId, deleteTask, toggleTaskCompletion }) => {
-    return (
+const Task = ({ task, sectionId, deleteTask, toggleTaskCompletion, canCheck, editTask, showOptions}) => {
+  const [isEditing, setIsEditing] = useState(false)
+
+  return (
         <div className='task'>
 
-            <h3>
+          {isEditing ? (
+            <EditTask
+              task={task}
+              sectionId={sectionId}
+              editTask={editTask}
+              setIsEditing={setIsEditing}
+            />
+          ) : (
+            <>
               <input type="checkbox"
                      checked={task.completed}
-                     onChange={() => toggleTaskCompletion(sectionId, task.id)}
-                     />
-                   {task.text} - {task.completed ? 'Completed' : 'Pending'}
+                     onChange={() => canCheck && toggleTaskCompletion(sectionId, task.id)}
+                     disabled={!canCheck} />
 
-            <FaTimes style={{
-                     color:
-                    'red', cursor: 'pointer' }}
+                 <h4 className='task-text'> {task.text} </h4>
+
+              {showOptions && (
+                   <div className='icon-actions'>
+            <FaTimes
+                     style={{ color: 'red', cursor: 'pointer' }}
                      onClick={() => deleteTask(sectionId, task.id)} />
-                     </h3>
 
+              <FaEdit
+                      onClick={() => setIsEditing(true)}
+                      style={{ cursor: 'pointer', marginLeft: '10px' }} />
+                      </div>
+              )}
+
+                     </>
+            )}
         </div>
     )
 }
+
 export default Task

@@ -27,28 +27,53 @@ body {
 }
 
 .section {
+  align-items: center;
+  justify-content: space-between;
   margin: 5px;
-  padding: 10px 20px;
+  padding: 10px 0px;
 }
 
+.section-functions {
+  display: flex;
+  align-items: center;
+}
+.section-title {
+  flex: 1;
+}
 .task {
-  background: #f4f4f4;
-  margin: 5px;
-  padding: 10px 20px;
-}
-
-.task h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 13px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid black;
 }
+
+.task-text {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.task input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+}
+
+.icon-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 
 .btn {
   display: inline-block;
   background: #000;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 20px;
   margin: 5px;
   border-radius: 5px;
   cursor: pointer;
@@ -57,11 +82,56 @@ body {
   font-family: inherit;
 }
 
+.btn:active {
+  transform: scale(0.95);
+}
+
 .btn-block {
   display: block;
   width: 100%;
 }
 
+.edit-task input {
+  border: 1px solid;
+  width: 60%;
+  height: 30px;
+  margin: 5px;
+  padding: 3px 7px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.edit-section {
+  margin-bottom: 20px;
+}
+
+.edit-section input {
+  border: 2px solid;
+  border-radius: 20px;
+  width: 60%;
+  height: 30px;
+  margin: 5px;
+  padding: 3px 7px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.edit-buttons {
+  display: inline-block;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 5px 5px;
+  margin: 2px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 12px;
+  font-family: inherit;
+}
+.edit-buttons:active {
+  transform: scale(0.95);
+}
 .add-task-form {
   margin-bottom: 40px;
 }
@@ -76,6 +146,7 @@ body {
 
 .form-control label {
   display: block;
+  font-weight: bold;
 }
 
 .form-control input {
@@ -84,15 +155,7 @@ body {
   margin: 5px;
   padding: 3px 7px;
   font-size: 17px;
-}
-
-.form-control-check label {
-  flex: 1;
-}
-
-.form-control-check input {
-  flex: 2;
-  height: 20px;
+  border: 1px solid;
 }
 
 footer {

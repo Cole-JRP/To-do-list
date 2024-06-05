@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 const AddSection = ({ addSection }) => {
     const [newSectionTitle, setNewSectionTitle] = useState('')
@@ -7,7 +7,7 @@ const AddSection = ({ addSection }) => {
         e.preventDefault()
 
         if (!newSectionTitle) {
-            alert('Please add a section')
+            alert('Please add a section name')
             return
         }
 
@@ -24,7 +24,7 @@ const AddSection = ({ addSection }) => {
             <div className={'form-control'}>
                 <label>Section</label>
                 <input
-                    type='text'
+                    type={'text'}
                     value={newSectionTitle}
                     onChange={(e) => setNewSectionTitle(e.target.value)}
                     placeholder='New Section'/>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 const AddTask = ({ sectionId, addTask }) => {
     const [newTask, setNewTask] = useState('')
@@ -7,7 +7,7 @@ const AddTask = ({ sectionId, addTask }) => {
         e.preventDefault()
 
         if (!newTask) {
-            alert('Please add a task')
+            alert('Please add a task ')
             return
         }
 
@@ -18,15 +18,15 @@ const AddTask = ({ sectionId, addTask }) => {
         }
     }
     return (
-        <form className={'add-task-form'}
+        <form className='add-task-form'
               onSubmit={onAddTask}>
-            <div className={'form-control'}>
+            <div className='form-control'>
                 <label>Task</label>
                 <input
-                    type={'text'}
+                    type='text'
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
-                    placeholder={'Add Task'}/>
+                    placeholder='New Task'/>
             </div>
 
             <input

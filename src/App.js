@@ -1,105 +1,185 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Header from './components/Header'
-import Sections from "./components/sections_component/Sections";
-import AddSection from "./components/sections_component/AddSection";
+import Footer from './components/Footer'
+import About from './components/About'
+import Sections from "./components/sections_component/Sections"
+import AddSection from "./components/sections_component/AddSection"
+
 function App() {
     const [showAddSection, setShowAddSection] = useState(false)
     const [showAddTask, setShowAddTask] = useState(false)
-    const [sections, setSections] = useState([
-        {
-            id: 1,
-            title: 'Foundation',
-            completed: false,
-            tasks: [
-                { id: 1, text: 'Task 1 ', completed: false },
-                { id: 2, text: 'Task 2 ', completed: false },
-                { id: 3, text: 'Task 3 ', completed: false },
-                { id: 4, text: 'Task 4 ', completed: false },
-            ],
+    const [sections, setSections] = useState([])
+
+  useEffect(() => {
+    const getSections = async () => {
+      const sectionsFromServer = await fetchSections()
+      setSections(sectionsFromServer)
+    }
+    getSections()
+  }, [])
+
+  const fetchSections = async () => {
+    const res = await fetch('http://localhost:5000/sections')
+    const data = await res.json()
+    return data
+
+  }
+
+     const addSection = async (title) => {
+      const newSection = { title,  completed: false, tasks: [] }
+        const res = await fetch('http://localhost:5000/sections',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newSection),
+        })
+             const data = await res.json()
+             setSections([...sections, data])
+    }
+
+  const addTaskToSection = async (sectionId, taskText) => {
+    const newTask = { text: taskText, completed: false, id: Date.now() }
+    const section = sections.find((section) => section.id === sectionId)
+    section.tasks.push(newTask);
+
+    const res = await fetch(`http://localhost:5000/sections/${sectionId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(section),
+    })
+
+    const data = await res.json()
+    setSections(sections.map(section => section.id === sectionId ? data : section))
+  }
+
+    const deleteSection = async (sectionId) => {
+      await fetch(`http://localhost:5000/sections/${sectionId}`, {
+        method: 'DELETE',
+      })
+      setSections(sections.filter((section) => section.id !== sectionId))
+    }
+
+    const deleteTask = async (sectionId, taskId) => {
+      const section = sections.find((section) => section.id === sectionId)
+      section.tasks = section.tasks.filter((task) => task.id !== taskId)
+
+      await fetch(`http://localhost:5000/sections/${sectionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-type' : 'application/json',
         },
-        {
-            id: 2,
-            title: 'Discovery',
-            completed: false,
-            tasks: [
-                { id: 1, text: 'Task 1 ', completed: false },
-                { id: 2, text: 'Task 2 ', completed: false },
-            ],
+        body: JSON.stringify(section)
+      })
+      setSections(sections.map((section) => (section.id === sectionId ? section : section)))
+    }
+
+  const toggleAddTask = (sectionId) => {
+    setShowAddTask((prevState) => (prevState === sectionId ? null : sectionId))
+  }
+
+  const toggleTaskCompletion = async (sectionId, taskId) => {
+    const sectionIndex = sections.findIndex((section) => section.id === sectionId)
+    const section = sections[sectionIndex]
+
+    if (sectionIndex > 0) {
+      const precedingSection = sections[sectionIndex - 1]
+      if (!precedingSection.tasks.every(task => task.completed)) {
+        return
+      }
+    }
+    const task = section.tasks.find((task) => task.id === taskId)
+    task.completed = !task.completed
+
+    const sectionCompleted = section.tasks.every(task => task.completed)
+    section.completed = sectionCompleted
+
+    const res = await fetch(`http://localhost:5000/sections/${sectionId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(section),
+    })
+
+    const data = await res.json()
+    setSections(sections.map(section => section.id === sectionId ? data : section))
+  }
+
+  const editSection = async (sectionId, newTitle) => {
+      const section = sections.find((section) => section.id === sectionId)
+      section.title = newTitle
+
+      const res = await fetch(`http://localhost:5000/sections/${sectionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type' : 'application/json',
         },
-        {
-            id: 3,
-            title: 'Delivery',
-            completed: false,
-            tasks: [
-                { id: 1, text: 'Task 1', completed: false },
-                { id: 2, text: 'Task 2 ', completed: false },
-            ],
-        },
-    ])
+        body: JSON.stringify(section),
+      })
 
-           const addSection = (title) => {
-        const newSection = { id: Date.now(), title,  completed: false, tasks: [] }
-        setSections([...sections, newSection])
-    }
+    const data = await res.json()
+    setSections(sections.map(section =>
+      section.id === sectionId ? data : section))
+  }
 
-       const addTaskToSection = (sectionId, taskText) => {
-        setSections(sections.map(section => {
-                  if (section.id === sectionId) {
-                  return { ...section, tasks: [...section.tasks,
-                      { id: Date.now(), text: taskText, completed: false }] }
-                  }
-            return section
-        }))
-       }
-    const deleteSection = (sectionId) => {
-        setSections(prevSections =>
-            prevSections.filter(section => section.id !== sectionId))
+  const editTask = async (sectionId, taskId, newText) => {
+    const section = sections.find((section) => section.id === sectionId)
+    const task = section.tasks.find((task) => task.id === taskId)
+    task.text = newText
 
-    }
+    const res = await fetch(`http://localhost:5000/sections/${sectionId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(section),
+    })
 
-    const deleteTask = (sectionId, taskId) => {
-        setSections(prevSections =>
-            prevSections.map(section =>
-                section.id === sectionId
-            ? {
-                        ...section,
-                        tasks: section.tasks.filter(task => task.id !== taskId),
-                    }
-                    : section
-            )
-        )
-    }
-
-    const toggleTaskCompletion = (sectionId, taskId) => {
-      setSections(sections.map(section => {
-        if (section.id === sectionId) {
-          return { ...section, tasks: section.tasks.map(task =>
-            task.id === taskId ? { ...task, completed: !task.completed } : task
-            )
-          }
-        }
-      }))
-    }
-
+    const data = await res.json()
+    setSections(sections.map(section => section.id === sectionId ? data : section))
+  }
 
 
   return (
+      <Router>
     <div className='container'>
-        <Header onAddSection={() => setShowAddSection (!showAddSection)}
-                showAddSection={showAddSection} />
-        {showAddSection && <AddSection addSection={addSection} />}
-        {sections.length > 0 ? (
-          <Sections
-            sections={sections}
-            deleteSection={deleteSection}
-            addTask={addTaskToSection}
-            deleteTask={deleteTask}
-            showAddTask={showAddTask}
-            toggleAddTask={() => setShowAddTask (!showAddTask)}
-            toggleTaskCompletion={toggleTaskCompletion}/>
-            ) : ( 'No Sections' )}
+        <Header
+          onAddSection={() => setShowAddSection (!showAddSection)}
+          showAddSection={showAddSection} />
+      <Routes>
+        <Route
+          path='/'
+          element={
+            <>
+              {showAddSection && <AddSection addSection={addSection} />}
+              {sections.length > 0 ? (
+                <Sections
+                  sections={sections}
+                  deleteSection={deleteSection}
+                  addTask={addTaskToSection}
+                  deleteTask={deleteTask}
+                  showAddTask={showAddTask}
+                  toggleAddTask={toggleAddTask}
+                  toggleTaskCompletion={toggleTaskCompletion}
+                  editSection={editSection}
+                  editTask={editTask}
+                />
+              ) : (
+                'No current sections'
+              )}
+            </>
+          }
+          />
+        <Route path='/about' element={<About />} />
+      </Routes>
+        <Footer />
     </div>
-  );
+      </Router>
+  )
 }
 
 

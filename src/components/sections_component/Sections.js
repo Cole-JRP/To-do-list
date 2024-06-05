@@ -1,20 +1,24 @@
-
-import Section from "./Section";
 import React from 'react'
-const Sections = ({ sections, deleteSection, deleteTask, addTask, showAddTask, toggleAddTask, toggleTaskCompletion }) => {
+import Section from "./Section"
+
+const Sections = ({ sections, deleteSection, deleteTask, addTask, showAddTask,
+                      toggleAddTask, toggleTaskCompletion, editTask, editSection}) => {
 
     return (
         <>
-            {sections.map((section) => (
+            {sections.map((section, index) => (
                 <Section
                     key={section.id}
                     section={section}
                     deleteSection={deleteSection}
                     deleteTask={deleteTask}
                     addTask={addTask}
-                    showAddTask={showAddTask}
+                    showAddTask={showAddTask === section.id}
                     toggleAddTask={toggleAddTask}
                     toggleTaskCompletion={toggleTaskCompletion}
+                    precedingSectionCompleted={index === 0 || sections[index - 1].completed}
+                    editSection={editSection}
+                    editTask={editTask}
                     />
             ))}
         </>
